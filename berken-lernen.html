@@ -146,7 +146,7 @@ el("lesson-prev").textContent=state.stage===0?"← Alle Kapitel":state.stage===2
 el("lesson-next").textContent=state.stage===0?"Beispiel ansehen →":state.stage===1?"Jetzt üben →":"Nächstes Kapitel →";
 }
 function normalize(v){return String(v||"").toLowerCase().trim().replace(/−/g,"-").replace(/\s+/g,"").replace(/,/g,".").replace(/×/g,"*")}
-function isRight(value,q){if(!value)return false;let x=normalize(value);if(q[2]==="lt")return x==="<";if(q[2]==="gt")return x===">";if(q[2]==="eq")return x==="=";let expected=normalize(q[2]);if(/^[-+]?\d+(\.\d+)?$/.test(expected))return Number(x)===Number(expected);return x===expected}
+function isRight(value,q){if(!value)return false;let x=normalize(value);if(q[2]==="lt")return x==="<";if(q[2]==="gt")return x===">";if(q[2]==="eq")return x==="=";let expected=normalize(q[2]);if(/^[-+]?\d+(\.\d+)?$/.test(expected))return Number(x)===Number(expected);if(/^\d+ \d+\/\d+$/.test(q[2]))return String(value).trim().replace(/\s+/g," ")===q[2];return x===expected}
 function answerDisplay(q){return q[2]==="lt"?"<":q[2]==="gt"?">":q[2]==="eq"?"=":q[2]}
 function renderPractice(){const m=find(),q=m.questions[state.index],a=resultAt(m.id,state.index),root=el("lesson-content");
 let symbols=q[2]==="lt"||q[2]==="gt"||q[2]==="eq";
@@ -156,8 +156,8 @@ renderFeedback(q,a);
 el("check-answer").addEventListener("click",()=>check(q));
 el("hint").addEventListener("click",()=>{updateResult({hinted:true});renderFeedback(q,resultAt(m.id,state.index))});
 el("reveal").addEventListener("click",()=>{updateResult({revealed:true});renderFeedback(q,resultAt(m.id,state.index))});
-if(symbols){root.querySelectorAll("[data-symbol]").forEach(b=>b.addEventListener("click",()=>{updateResult({value:b.dataset.symbol});root.querySelectorAll("[data-symbol]").forEach(c=>c.classList.toggle("picked",c===b));renderFeedback(q,resultAt(m.id,state.index))}))}
-else{el("answer").addEventListener("input",e=>{updateResult({value:e.target.value});renderFeedback(q,resultAt(m.id,state.index))});el("answer").addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();check(q)}})}
+if(symbols){root.querySelectorAll("[data-symbol]").forEach(b=>b.addEventListener("click",()=>{updateResult({value:b.dataset.symbol,correct:false,first:false});root.querySelectorAll("[data-symbol]").forEach(c=>c.classList.toggle("picked",c===b));renderFeedback(q,resultAt(m.id,state.index))}))}
+else{el("answer").addEventListener("input",e=>{updateResult({value:e.target.value,correct:false,first:false});renderFeedback(q,resultAt(m.id,state.index))});el("answer").addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();check(q)}})}
 el("prev-task").addEventListener("click",()=>{state.index--;store();renderLesson()});
 el("next-task").addEventListener("click",()=>{if(state.index<m.questions.length-1){state.index++;store();renderLesson();el("lesson-content").scrollIntoView({behavior:"smooth",block:"start"})}else{showChapterEnd(m)}});
 }
